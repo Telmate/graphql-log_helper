@@ -207,6 +207,34 @@ RSpec.describe Graphql::LogHelper, type: :request do
       end
     end
 
+    context 'with query empty variables' do
+      let(:request_paylod) do
+        {
+          params: {
+            variables: {},
+            query: <<-QUERY
+              query books($authorId: ID!) {
+                books(authorId: $authorId) {
+                  id
+                }
+              }
+            QUERY
+          }
+        }
+      end
+
+      let(:expected_log_output) do
+        {
+          params: [['books', []]],
+          resolvers: ['books']
+        }
+      end
+
+      it 'logs the resolver name and params' do
+        expect(Rails.logger).to have_received(:info).with(formatted_expected_log_output)
+      end
+    end
+
     context 'with multiple queries' do
       let(:request_paylod) do
         {

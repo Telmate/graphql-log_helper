@@ -7,12 +7,15 @@ module Graphql
   class LogHelper
     class << self
       def log_details(request_params)
-        selections = parse_query(request_params[:query])&.definitions&.first&.selections
+        definition = parse_query(request_params[:query])&.definitions&.first
+        selections = definition&.selections
         return {} if selections.blank?
 
+        variables = request_params[:variables] || {}
+
         query_params =
-          if request_params[:variables].present?
-            query_params_given_variables(selections, request_params[:variables])
+          if variables.present? || (definition.respond_to?(:variables) && definition.variables.any?)
+            query_params_given_variables(selections, variables)
           else
             query_params_given_no_variables(selections)
           end
