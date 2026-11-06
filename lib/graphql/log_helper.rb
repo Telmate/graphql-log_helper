@@ -52,6 +52,8 @@ module Graphql
             selection.arguments.map { |arg| selection_to_array(arg) }
           elsif selection.value.respond_to?(:arguments)
             selection.value.arguments.map { |arg| selection_to_array(arg) }
+          elsif selection.value.is_a?(GraphQL::Language::Nodes::NullValue)
+            nil
           else
             selection.value
           end

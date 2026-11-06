@@ -44,6 +44,33 @@ RSpec.describe Graphql::LogHelper, type: :request do
       end
     end
 
+    context 'without nested null arguments' do
+      let(:request_paylod) do
+        {
+          params: {
+            query: <<-QUERY
+              query {
+                books(authorId: null) {
+                  id
+                }
+              }
+            QUERY
+          }
+        }
+      end
+
+      let(:expected_log_output) do
+        {
+          params: [['books', [['authorId', nil]]]],
+          resolvers: ['books']
+        }
+      end
+
+      it 'logs the resolver name and params' do
+        expect(Rails.logger).to have_received(:info).with(formatted_expected_log_output)
+      end
+    end
+
     context 'with nested arguments' do
       let(:request_paylod) do
         {
